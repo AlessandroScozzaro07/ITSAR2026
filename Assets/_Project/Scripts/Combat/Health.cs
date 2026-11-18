@@ -15,6 +15,9 @@ public class Health : MonoBehaviour
     public float Max => maxHealth;
     public bool IsDead => Current <= 0f;
 
+    [SerializeField] bool isPlayer = false;
+    public static Health PlayerHealth;
+
     /// <summary>Invocato a ogni variazione: (vita attuale, vita massima).</summary>
     public event Action<float, float> HealthChanged;
 
@@ -24,6 +27,10 @@ public class Health : MonoBehaviour
     private void Awake()
     {
         Current = maxHealth;
+        if (isPlayer)
+        {
+            PlayerHealth = this;
+        }
     }
 
     public void TakeDamage(float amount)
@@ -32,7 +39,7 @@ public class Health : MonoBehaviour
 
         Current = Mathf.Max(0f, Current - amount);
         HealthChanged?.Invoke(Current, maxHealth);
-
+        Debug.Log($"object{gameObject.name} took {amount} damage. {Current}/{maxHealth}");
         if (Current <= 0f)
         {
             Die();

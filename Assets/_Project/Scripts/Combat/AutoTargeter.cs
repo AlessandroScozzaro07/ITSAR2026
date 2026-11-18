@@ -1,5 +1,7 @@
+using NUnit.Framework;
 using UnityEngine;
-
+using System;
+using System.Collections.Generic;
 /// <summary>
 /// Trova automaticamente il bersaglio più vicino entro un raggio:
 /// 1. OverlapSphere sul layer dei bersagli (query fisica volumetrica)
@@ -44,6 +46,7 @@ public class AutoTargeter : MonoBehaviour
         Vector3 eye = transform.position + Vector3.up * eyeHeight;
         Collider[] hits = Physics.OverlapSphere(transform.position, range, targetMask, QueryTriggerInteraction.Collide);
 
+
         Health best = null;
         float bestSqrDistance = float.MaxValue;
 
@@ -64,6 +67,19 @@ public class AutoTargeter : MonoBehaviour
         }
 
         return best;
+    }
+    public Health[] FindAllTargetsInRange(float radius)
+    {
+        Collider[] hits = Physics.OverlapSphere(transform.position, radius, targetMask, QueryTriggerInteraction.Collide);
+        List<Health> AliveTargets = new();
+        foreach(Collider hit in hits)
+        {
+           if(hit.TryGetComponent(out Health health) && !health.IsDead) //se su quel componente esiste un ogetto se viene trovato restituisci come variabile
+            {                                                           // controllo se quel component è morto
+                AliveTargets.Add(health);                               // se vivo aggiungi alla lista
+            }
+        }
+        return AliveTargets.ToArray();                                  // ritorno array da quella vista
     }
 
     private bool IsStillValid(Health target)
